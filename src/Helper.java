@@ -75,6 +75,16 @@ public class Helper {
         return Helper.reverseProb(newProbs, pop_size);
     }
 
+    public static double randomDouble(double min, double max) {
+        Random rand = new Random();
+        return min + (max - min) * rand.nextDouble();
+    }
+
+    public static int randomInt(int min, int max) {
+        Random rand = new Random();
+        return rand.nextInt(max + 1) + min;
+    }
+
     // CountDelay4All todo
 
 }

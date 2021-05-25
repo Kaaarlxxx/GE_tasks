@@ -65,7 +65,7 @@ public class MinTaskDelay {
                 }
             }
 
-            // PMX
+            //PMX
             for (int i = 0; i < N; i++) {
                 double crosswordProbability = Helper.randomDouble(0, 1);
                 if (crosswordProbability <= PC) {
@@ -87,29 +87,28 @@ public class MinTaskDelay {
                             int index = repetitions.get(j);
                             child.tasks.set(index, tasksNotInChild.get(j));
                         }
+
                     }
 
                     population.set(i, child);
                 }
             }
 
+
             //ruletka
+
+
             for (int i = 0; i < N; i++) {
                 populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());
             }
+            population = (ArrayList<Permutation>) populationAfterRoulette.clone();
+            populationAfterRoulette.clear();
 
-            //ruletka
-//            for (int i = 0; i < N; i++) {
-//                populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());
-//            }
-//            population = (ArrayList<Permutation>) populationAfterRoulette.clone();
-//            populationAfterRoulette.clear();
-//
-
-
-            population = Helper.steadyStateSelection(population, N);
-            population = Helper.countDelay4All(population, N);
             probs = Helper.countProbs(population, N);
+
+
+//            population = Helper.steadyStateSelection(population, N);
+//            population = Helper.countDelay4All(population, N);
 
 
             tmpBestPerm = population.get(0).copy();

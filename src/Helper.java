@@ -5,6 +5,7 @@ import java.util.Random;
 
 public class Helper {
     public static Random r = new Random();
+    public static int tournamentSize = 2;
 
     public static void printTable(String tab[]) {
 
@@ -104,6 +105,33 @@ public class Helper {
         return newone;
     }
 
+
+    //wybierz losowych uczestnikow do turnieju o podanym rozmiarze
+    //najlepszy(dajacy minimalny czas opoznienia) wygrywa i wchodzi na liste
+    // powtarzaj turnieje aby otrzymac kompletna populacje
+
+    public static ArrayList<Permutation> tournament(ArrayList<Permutation> Population, int pop_Size) {
+
+        ArrayList<Permutation> Tournament = new ArrayList<>();
+        ArrayList<Permutation> AfterTournament = new ArrayList<Permutation>();
+        Permutation tmpperm;
+
+        for (int j = 0; j < pop_Size; j++) {
+            Tournament.clear();
+            for (int i = 0; i < tournamentSize; i++) {
+                tmpperm = Population.get(r.nextInt(pop_Size)).copy();
+                Tournament.add(tmpperm);
+
+                if (Tournament.get(0).delay < Tournament.get(1).delay) AfterTournament.add(Tournament.get(0).copy());
+
+                else AfterTournament.add(Tournament.get(1).copy());
+
+            }
+        }
+        //tutaj powinna byc krzyzowka wszystkich zwyciezcow
+        ArrayList<Permutation> winners = pmx(AfterTournament);
+        return winners;
+    }
 
     public static ArrayList steadyStateSelection(ArrayList<Permutation> Population, int pop_size) {
         Permutation[] table = new Permutation[pop_size];

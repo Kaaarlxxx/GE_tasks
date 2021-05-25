@@ -13,11 +13,12 @@ public class MinTaskDelay {
     public static void main(String[] args) {
 
         Random r = new Random();
-        ArrayList<Task> input = Helper.readTasksFromFile("projekt8.txt");
+        //Helper.taskGenerator(10);
+        ArrayList<Task> input = Helper.readTasksFromFile("projekt10.txt");
         ArrayList<Double> probs = new ArrayList<Double>();
         ArrayList<Permutation> population = new ArrayList<>();
         ArrayList<Permutation> populationAfterRoulette = new ArrayList<>();
-        int N = 20; //rozmiar populacji
+        int N = 2000; //rozmiar populacji
         Permutation BestPerm;
         Permutation tmpBestPerm;
 
@@ -38,7 +39,7 @@ public class MinTaskDelay {
             shuffle(tmpperm.tasks);
             tmpperm.countDelay();
             population.add(tmpperm.copy());
-            System.out.println(population.get(i).delay);
+            //System.out.println(population.get(i).delay);
         }
 
         probs = Helper.countProbs(population, N);
@@ -65,38 +66,37 @@ public class MinTaskDelay {
                 }
             }
 
-            //PMX
-            for (int i = 0; i < N; i++) {
-                double crosswordProbability = Helper.randomDouble(0, 1);
-                if (crosswordProbability <= PC) {
-                    int permutationToCross = Helper.randomInt(0, population.size() - 1);
-                    Permutation currentParent = population.get(i);
-                    Permutation secondParent = population.get(permutationToCross);
-                    Permutation child = Permutation.crossword(currentParent, secondParent);
-
-                    ArrayList<Integer> repetitions = child.repetitionIds();
-
-                    if (repetitions.size() > 0) {
-                        ArrayList<Task> tasksNotInChild = new ArrayList<>();
-                        input.forEach(inputTask -> {
-                            if (!child.tasks.contains(inputTask)) {
-                                tasksNotInChild.add(inputTask);
-                            }
-                        });
-                        for (int j = 0; j < repetitions.size(); j++) {
-                            int index = repetitions.get(j);
-                            child.tasks.set(index, tasksNotInChild.get(j));
-                        }
-
-                    }
-
-                    population.set(i, child);
-                }
-            }
+//            //PMX
+//            for (int i = 0; i < N; i++) {
+//                double crosswordProbability = Helper.randomDouble(0, 1);
+//                if (crosswordProbability <= PC) {
+//                    int permutationToCross = Helper.randomInt(0, population.size() - 1);
+//                    Permutation currentParent = population.get(i);
+//                    Permutation secondParent = population.get(permutationToCross);
+//                    Permutation child = Permutation.crossword(currentParent, secondParent);
+//
+//                    ArrayList<Integer> repetitions = child.repetitionIds();
+//
+//                    if (repetitions.size() > 0) {
+//                        ArrayList<Task> tasksNotInChild = new ArrayList<>();
+//                        input.forEach(inputTask -> {
+//                            if (!child.tasks.contains(inputTask)) {
+//                                tasksNotInChild.add(inputTask);
+//                            }
+//                        });
+//                        for (int j = 0; j < repetitions.size(); j++) {
+//                            int index = repetitions.get(j);
+//                            child.tasks.set(index, tasksNotInChild.get(j));
+//                        }
+//
+//                    }
+//
+//                    population.set(i, child);
+//                }
+//            }
 
 
             //ruletka
-
 
             for (int i = 0; i < N; i++) {
                 populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());

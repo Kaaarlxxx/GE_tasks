@@ -7,6 +7,22 @@ public class Helper {
     public static Random r = new Random();
     public static int tournamentSize = 2;
 
+    public static void createFile(String filename) {
+        try {
+            File myObj = new File(filename);
+            if (myObj.createNewFile()) {
+                System.out.println("File created: " + myObj.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+
+    }
+
     public static void printTable(String tab[]) {
 
         for (int i = 0; i < tab.length; i++) {
@@ -110,28 +126,28 @@ public class Helper {
     //najlepszy(dajacy minimalny czas opoznienia) wygrywa i wchodzi na liste
     // powtarzaj turnieje aby otrzymac kompletna populacje
 
-    public static ArrayList<Permutation> tournament(ArrayList<Permutation> Population, int pop_Size) {
-
-        ArrayList<Permutation> Tournament = new ArrayList<>();
-        ArrayList<Permutation> AfterTournament = new ArrayList<Permutation>();
-        Permutation tmpperm;
-
-        for (int j = 0; j < pop_Size; j++) {
-            Tournament.clear();
-            for (int i = 0; i < tournamentSize; i++) {
-                tmpperm = Population.get(r.nextInt(pop_Size)).copy();
-                Tournament.add(tmpperm);
-
-                if (Tournament.get(0).delay < Tournament.get(1).delay) AfterTournament.add(Tournament.get(0).copy());
-
-                else AfterTournament.add(Tournament.get(1).copy());
-
-            }
-        }
-        //tutaj powinna byc krzyzowka wszystkich zwyciezcow
-        ArrayList<Permutation> winners = pmx(AfterTournament);
-        return winners;
-    }
+//    public static ArrayList<Permutation> tournament(ArrayList<Permutation> Population, int pop_Size) {
+//
+//        ArrayList<Permutation> Tournament = new ArrayList<>();
+//        ArrayList<Permutation> AfterTournament = new ArrayList<Permutation>();
+//        Permutation tmpperm;
+//
+//        for (int j = 0; j < pop_Size; j++) {
+//            Tournament.clear();
+//            for (int i = 0; i < tournamentSize; i++) {
+//                tmpperm = Population.get(r.nextInt(pop_Size)).copy();
+//                Tournament.add(tmpperm);
+//
+//                if (Tournament.get(0).delay < Tournament.get(1).delay) AfterTournament.add(Tournament.get(0).copy());
+//
+//                else AfterTournament.add(Tournament.get(1).copy());
+//
+//            }
+//        }
+//        //tutaj powinna byc krzyzowka wszystkich zwyciezcow
+//        ArrayList<Permutation> winners = pmx(AfterTournament);
+//        return winners;
+//    }
 
     public static ArrayList steadyStateSelection(ArrayList<Permutation> Population, int pop_size) {
         Permutation[] table = new Permutation[pop_size];
@@ -161,6 +177,25 @@ public class Helper {
         ArrayList<Permutation> newone = new ArrayList<Permutation>(Arrays.asList(table));
 
         return newone;
+    }
+
+    public static void taskGenerator(int numberOfTasks) {
+        String fileName = "projekt" + numberOfTasks + ".txt";
+        createFile(fileName);
+        try {
+            FileWriter myWriter = new FileWriter(fileName);
+            myWriter.write("nr_zadania\tczas_przybycia\tczas_wykonania\twymagany_czas_zakonczenia\n");
+
+            for (int i = 0; i < numberOfTasks; i++) {
+                myWriter.write(i + "\t" + "0\t" + (r.nextInt(9) + 1) + "\t" + (r.nextInt(39) + 1) + "\n");
+            }
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
     }
 }
 

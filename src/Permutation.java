@@ -55,6 +55,19 @@ public class Permutation {
 
     }
 
+    @Override
+    public String toString() {
+        Task tmp;
+        String fin = "---------------------------------------------\n";
+        for (int i = 0; i < tasks.size(); i++) {
+            tmp = tasks.get(i);
+            fin += tmp.toString();
+        }
+        fin += "delay = " + this.delay + "\n";
+        fin += "--------------------------------------------------------";
+        return fin;
+    }
+
     //zamienia ze soba miejscami taski w permutacji (na podstawie prawdopodobienstwa)
     public void mutate() {
         double prob = 0.2;
@@ -147,8 +160,6 @@ public class Permutation {
                 }
             }
         }
-        children[0].countDelay();
-        children[1].countDelay();
         return children;
     }
 }

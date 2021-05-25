@@ -45,6 +45,11 @@ public class Task implements Comparable<Task> {
         System.out.println(this.id + "    " + this.arrTime + "    " + this.neededTime + "    " + this.reqTime);
     }
 
+    @Override
+    public String toString() {
+        return id + "\t" + arrTime + "\t" + neededTime + "\t" + reqTime + "\n";
+    }
+
     public Task copy() {
         Task tmp = new Task(this.id, this.arrTime, this.neededTime, this.reqTime);
         return tmp;

@@ -2,7 +2,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
 import static java.util.Collections.shuffle;
@@ -18,16 +17,17 @@ public class MinTaskDelay {
         ArrayList<Double> probs = new ArrayList<Double>();
         ArrayList<Permutation> population = new ArrayList<>();
         ArrayList<Permutation> populationAfterRoulette = new ArrayList<>();
-        int N = 200; //rozmiar populacji
+        int N = 1500; //rozmiar populacji
         Permutation BestPerm;
         Permutation tmpBestPerm;
 
         PrintWriter highest = null;
         PrintWriter temp = null;
 
+
         try {
-            highest = new PrintWriter(new FileOutputStream("highest.txt"));
-            temp = new PrintWriter(new FileOutputStream("tmp.txt"));
+            highest = new PrintWriter(new FileOutputStream("Results/highest" + N + ".txt"));
+            temp = new PrintWriter(new FileOutputStream("Results/tmp" + N + ".txt"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class MinTaskDelay {
         }
         double probability;
 
-        for (int ev = 0; ev < 1000; ev++) {
+        for (int ev = 0; ev < 10000; ev++) {
 
             //Mutowanie
             for (int i = 0; i < N; i++) {
@@ -76,23 +76,6 @@ public class MinTaskDelay {
                     Permutation currentParent = population.get(i);
                     Permutation secondParent = population.get(secondPermutation);
                     Permutation[] children = Permutation.crossword(currentParent, secondParent);
-
-                    // tylko do testów
-                    try {
-                        for (int x = 0; x < children[1].tasks.size(); x++) {
-                            Task fooTask = new Task();
-                            fooTask.setId(x + 1);
-                            int freq = Collections.frequency(children[0].tasks, fooTask);
-                            if (freq > 1)
-                                throw new Exception("Powtórzenie tasku " + (x + 1));
-                            if (freq == 0)
-                                throw new Exception("Brak tasku " + (x + 1));
-                        }
-                    } catch (Exception e) {
-                        System.out.println(e);
-                        return;
-                    }
-
                     population.set(i, children[0]);
                     population.set(secondPermutation, children[1]);
                 }
@@ -107,11 +90,8 @@ public class MinTaskDelay {
             populationAfterRoulette.clear();
 
             probs = Helper.countProbs(population, N);
-
-
-//            population = Helper.steadyStateSelection(population, N);
-//            population = Helper.countDelay4All(population, N);
-
+            //    population = Helper.steadyStateSelection(population, N);
+            population = Helper.countDelay4All(population, N);
 
             tmpBestPerm = population.get(0).copy();
             for (int i = 0; i < N; i++) {
@@ -124,6 +104,9 @@ public class MinTaskDelay {
             temp.println(tmpBestPerm.delay);
             highest.println(BestPerm.delay);
         }
+
+        highest.println("nr_zadania\tczas_przybycia\tczas_wykonania\twymagany_czas_zakonczenia");
+        highest.println(BestPerm.toString());
 
 
         highest.close();

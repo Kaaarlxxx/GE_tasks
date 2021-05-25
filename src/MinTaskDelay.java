@@ -17,7 +17,7 @@ public class MinTaskDelay {
         ArrayList<Double> probs = new ArrayList<Double>();
         ArrayList<Permutation> population = new ArrayList<>();
         ArrayList<Permutation> populationAfterRoulette = new ArrayList<>();
-        int N = 20; //rozmiar populacji
+        int N = 200; //rozmiar populacji
         Permutation BestPerm;
         Permutation tmpBestPerm;
 
@@ -31,14 +31,13 @@ public class MinTaskDelay {
             e.printStackTrace();
         }
 
-
         //wypelnianie populacji taskami w losowej kolejnosci
         Permutation tmpperm = new Permutation(input, 0);
         for (int i = 0; i < N; i++) {
             shuffle(tmpperm.tasks);
             tmpperm.countDelay();
             population.add(tmpperm.copy());
-            System.out.println(population.get(i).delay);
+            //System.out.println(population.get(i).delay);
         }
 
         probs = Helper.countProbs(population, N);
@@ -83,22 +82,18 @@ public class MinTaskDelay {
             }
 
             //ruletka
+
             for (int i = 0; i < N; i++) {
                 populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());
             }
+            population = (ArrayList<Permutation>) populationAfterRoulette.clone();
+            populationAfterRoulette.clear();
 
-            //ruletka
-//            for (int i = 0; i < N; i++) {
-//                populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());
-//            }
-//            population = (ArrayList<Permutation>) populationAfterRoulette.clone();
-//            populationAfterRoulette.clear();
-//
-
-
-            population = Helper.steadyStateSelection(population, N);
-            population = Helper.countDelay4All(population, N);
             probs = Helper.countProbs(population, N);
+
+
+//            population = Helper.steadyStateSelection(population, N);
+//            population = Helper.countDelay4All(population, N);
 
 
             tmpBestPerm = population.get(0).copy();

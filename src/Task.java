@@ -37,6 +37,10 @@ public class Task implements Comparable<Task> {
         return this.arrTime;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void print() {
         System.out.println(this.id + "    " + this.arrTime + "    " + this.neededTime + "    " + this.reqTime);
     }
@@ -51,7 +55,13 @@ public class Task implements Comparable<Task> {
         return o.id.compareTo(this.id);
     }
 
-    public boolean equals(Task o) {
-        return o.id.equals(this.id);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Task tmp = (Task) obj;
+        return tmp.id.equals(this.id);
     }
 }

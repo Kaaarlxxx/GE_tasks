@@ -64,8 +64,8 @@ public class Permutation {
         for (int i = 0; i < tasks.size(); i++) {
             if (r.nextDouble() < prob) {
                 tmp = tasks.get(i).copy();
-                pos = r.nextInt(50);
-                while (pos != i) pos = r.nextInt(50);
+                pos = r.nextInt(tasks.size());
+                while (pos != i) pos = r.nextInt(tasks.size());
                 tasks.set(i, tasks.get(pos).copy());
                 tasks.set(pos, tmp);
             }
@@ -147,7 +147,8 @@ public class Permutation {
                 }
             }
         }
-
+        children[0].countDelay();
+        children[1].countDelay();
         return children;
     }
 }

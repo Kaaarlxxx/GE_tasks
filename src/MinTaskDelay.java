@@ -69,27 +69,16 @@ public class MinTaskDelay {
             for (int i = 0; i < N; i++) {
                 double crosswordProbability = Helper.randomDouble(0, 1);
                 if (crosswordProbability <= PC) {
-                    int permutationToCross = Helper.randomInt(0, population.size() - 1);
+                    int secondPermutation;
+                    do {
+                        secondPermutation = Helper.randomInt(0, population.size() - 1);
+                    } while (secondPermutation == i);
                     Permutation currentParent = population.get(i);
-                    Permutation secondParent = population.get(permutationToCross);
-                    Permutation child = Permutation.crossword(currentParent, secondParent);
+                    Permutation secondParent = population.get(secondPermutation);
+                    Permutation[] children = Permutation.crossword(currentParent, secondParent);
 
-                    ArrayList<Integer> repetitions = child.repetitionIds();
-
-                    if (repetitions.size() > 0) {
-                        ArrayList<Task> tasksNotInChild = new ArrayList<>();
-                        input.forEach(inputTask -> {
-                            if (!child.tasks.contains(inputTask)) {
-                                tasksNotInChild.add(inputTask);
-                            }
-                        });
-                        for (int j = 0; j < repetitions.size(); j++) {
-                            int index = repetitions.get(j);
-                            child.tasks.set(index, tasksNotInChild.get(j));
-                        }
-                    }
-
-                    population.set(i, child);
+                    population.set(i, children[0]);
+                    population.set(secondPermutation, children[1]);
                 }
             }
 

@@ -72,40 +72,82 @@ public class Permutation {
         }
     }
 
-    public static Permutation crossword(Permutation parent1, Permutation parent2) {
-        Permutation child = new Permutation();
+    private Integer[] getCrossPoints() {
         int crossPoint1;
         int crossPoint2;
         do {
-            crossPoint1 = Helper.randomInt(0, parent1.tasks.size() - 1);
-            crossPoint2 = Helper.randomInt(0, parent2.tasks.size() - 1);
+            crossPoint1 = Helper.randomInt(0, this.tasks.size() - 1);
+            crossPoint2 = Helper.randomInt(0, this.tasks.size() - 1);
         } while (crossPoint2 < crossPoint1);
 
-        for (int i = 0; i < crossPoint1; i++) {
-            child.tasks.add(parent1.tasks.get(i));
-        }
-
-        for (int i = crossPoint1; i < crossPoint2; i++) {
-            child.tasks.add(parent2.tasks.get(i));
-        }
-
-        for (int i = crossPoint2; i < parent1.tasks.size(); i++) {
-            child.tasks.add(parent1.tasks.get(i));
-        }
-
-        return child;
+        return new Integer[]{crossPoint1, crossPoint2};
     }
 
-    public ArrayList<Integer> repetitionIds() {
-        ArrayList<Integer> repetitions = new ArrayList<>();
-        int size = this.tasks.size();
+    private void fillTasksWithNull(int size) {
         for (int i = 0; i < size; i++) {
-            Task current = this.tasks.get(i);
-            for (int j = i; j < size; j++) {
-                if (current == this.tasks.get(j) && j != i)
-                    repetitions.add(i);
+            this.tasks.add(null);
+        }
+    }
+
+    public static Permutation[] crossword(Permutation parent1, Permutation parent2) {
+        Permutation[] children = new Permutation[2];
+        children[0] = new Permutation();
+        children[0].fillTasksWithNull(parent1.tasks.size());
+        children[1] = new Permutation();
+        children[1].fillTasksWithNull(parent1.tasks.size());
+        Integer[] crossPoints = parent1.getCrossPoints();
+
+        for (int i = crossPoints[0]; i < crossPoints[1]; i++) {
+            children[0].tasks.set(i, parent2.tasks.get(i));
+            children[1].tasks.set(i, parent1.tasks.get(i));
+        }
+
+        for (int i = 0; i < crossPoints[0]; i++) {
+            Task parent1Task = parent1.tasks.get(i);
+            Task parent2Task = parent2.tasks.get(i);
+            if (!children[0].tasks.contains(parent1Task)) {
+                children[0].tasks.set(i, parent1Task);
+            }
+
+            if (!children[1].tasks.contains(parent2Task)) {
+                children[1].tasks.set(i, parent2Task);
             }
         }
-        return repetitions;
+
+        for (int i = crossPoints[1]; i < parent1.tasks.size(); i++) {
+            Task parent1Task = parent1.tasks.get(i);
+            Task parent2Task = parent2.tasks.get(i);
+            if (!children[0].tasks.contains(parent1Task)) {
+                children[0].tasks.set(i, parent1Task);
+            }
+
+            if (!children[1].tasks.contains(parent2Task)) {
+                children[1].tasks.set(i, parent2Task);
+            }
+        }
+
+        for (int i = 0; i < parent1.tasks.size(); i++) {
+            if (children[0].tasks.get(i) == null) {
+                for (int j = 0; j < parent2.tasks.size(); j++) {
+                    Task parent2Task = parent2.tasks.get(j);
+                    if (!children[0].tasks.contains(parent2Task)) {
+                        children[0].tasks.set(i, parent2Task);
+                        break;
+                    }
+                }
+            }
+
+            if (children[1].tasks.get(i) == null) {
+                for (int j = 0; j < parent1.tasks.size(); j++) {
+                    Task parent1Task = parent1.tasks.get(j);
+                    if (!children[1].tasks.contains(parent1Task)) {
+                        children[1].tasks.set(i, parent1Task);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return children;
     }
 }

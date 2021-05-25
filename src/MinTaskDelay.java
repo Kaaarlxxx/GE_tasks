@@ -2,6 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import static java.util.Collections.shuffle;
@@ -75,6 +76,22 @@ public class MinTaskDelay {
                     Permutation currentParent = population.get(i);
                     Permutation secondParent = population.get(secondPermutation);
                     Permutation[] children = Permutation.crossword(currentParent, secondParent);
+
+                    // tylko do testów
+                    try {
+                        for (int x = 0; x < children[1].tasks.size(); x++) {
+                            Task fooTask = new Task();
+                            fooTask.setId(x + 1);
+                            int freq = Collections.frequency(children[0].tasks, fooTask);
+                            if (freq > 1)
+                                throw new Exception("Powtórzenie tasku " + (x + 1));
+                            if (freq == 0)
+                                throw new Exception("Brak tasku " + (x + 1));
+                        }
+                    } catch (Exception e) {
+                        System.out.println(e);
+                        return;
+                    }
 
                     population.set(i, children[0]);
                     population.set(secondPermutation, children[1]);

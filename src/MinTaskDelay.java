@@ -3,6 +3,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 import static java.util.Collections.shuffle;
 
@@ -12,26 +13,39 @@ public class MinTaskDelay {
 
     public static void main(String[] args) {
 
+        Scanner s = new Scanner(System.in);
         Random r = new Random();
-        ArrayList<Task> input = Helper.readTasksFromFile("projekt8.txt");
-        ArrayList<Double> probs = new ArrayList<Double>();
+        ArrayList input = Helper.readTasksFromFile("projekt8.txt");
+        ArrayList probs = new ArrayList<Double>();
         ArrayList<Permutation> population = new ArrayList<>();
         ArrayList<Permutation> populationAfterRoulette = new ArrayList<>();
-        int N = 1500; //rozmiar populacji
+        int N = 5000; //rozmiar populacji
         Permutation BestPerm;
         Permutation tmpBestPerm;
-
+        int selectionMethod = 0;
         PrintWriter highest = null;
         PrintWriter temp = null;
 
-
-        try {
-            highest = new PrintWriter(new FileOutputStream("Results/highest" + N + ".txt"));
-            temp = new PrintWriter(new FileOutputStream("Results/tmp" + N + ".txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        System.out.println("Type selection method : 1.ruletka\n2.steadystate\n");
+        selectionMethod = s.nextInt();
+        if (selectionMethod == 1) {
+            System.out.println("Roulette Selected");
+            try {
+                highest = new PrintWriter(new FileOutputStream("Results/Ruletka/highest" + N + ".txt"));
+                temp = new PrintWriter(new FileOutputStream("Results/Ruletka/tmp" + N + ".txt"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
-
+        if (selectionMethod == 2) {
+            System.out.println("SteadyState Selected");
+            try {
+                highest = new PrintWriter(new FileOutputStream("Results/SteadyState/highest" + N + ".txt"));
+                temp = new PrintWriter(new FileOutputStream("Results/SteadyState/tmp" + N + ".txt"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         //wypelnianie populacji taskami w losowej kolejnosci
         Permutation tmpperm = new Permutation(input, 0);
         for (int i = 0; i < N; i++) {
@@ -46,7 +60,9 @@ public class MinTaskDelay {
 
         // wybieranie najlepszej permutacji (z najmniejszym opoznieniem)
         BestPerm = population.get(0).copy();
+        assert highest != null;
         highest.println(BestPerm.delay);
+        temp.println(BestPerm.delay);
 
         for (int i = 1; i < N; i++) {
             if (population.get(i).delay < BestPerm.delay) {
@@ -54,9 +70,9 @@ public class MinTaskDelay {
             }
         }
         double probability;
+        boolean found = false;
 
         for (int ev = 0; ev < 10000; ev++) {
-
             //Mutowanie
             for (int i = 0; i < N; i++) {
                 probability = r.nextDouble();
@@ -64,7 +80,7 @@ public class MinTaskDelay {
                     population.get(i).mutate();
                 }
             }
-
+            assert temp != null;
             // PMX
             for (int i = 0; i < N; i++) {
                 double crosswordProbability = Helper.randomDouble(0, 1);
@@ -82,15 +98,17 @@ public class MinTaskDelay {
             }
 
             //ruletka
-
-            for (int i = 0; i < N; i++) {
-                populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());
+            if (selectionMethod == 1) {
+                for (int i = 0; i < N; i++) {
+                    populationAfterRoulette.add(population.get(Helper.posRoulette(probs, N)).copy());
+                }
+                population = (ArrayList<Permutation>) populationAfterRoulette.clone();
+                populationAfterRoulette.clear();
             }
-            population = (ArrayList<Permutation>) populationAfterRoulette.clone();
-            populationAfterRoulette.clear();
-
             probs = Helper.countProbs(population, N);
-            //    population = Helper.steadyStateSelection(population, N);
+            if (selectionMethod == 2) {
+                population = Helper.steadyStateSelection(population, N);
+            }
             population = Helper.countDelay4All(population, N);
 
             tmpBestPerm = population.get(0).copy();
@@ -100,9 +118,21 @@ public class MinTaskDelay {
                 }
             }
 
-            if (tmpBestPerm.delay < BestPerm.delay) BestPerm = tmpBestPerm.copy();
-            temp.println(tmpBestPerm.delay);
-            highest.println(BestPerm.delay);
+
+            if (ev % 10 != 0) {
+                if (tmpBestPerm.delay < BestPerm.delay) {
+                    BestPerm = tmpBestPerm.copy();
+                    found = true;
+                }
+            }
+
+            if (ev % 10 == 0) {
+                if (tmpBestPerm.delay < BestPerm.delay) BestPerm = tmpBestPerm.copy();
+                if (found) temp.println(BestPerm.delay);
+                else temp.println(tmpBestPerm.delay);
+                highest.println(BestPerm.delay);
+                found = false;
+            }
         }
 
         highest.println("nr_zadania\tczas_przybycia\tczas_wykonania\twymagany_czas_zakonczenia");
